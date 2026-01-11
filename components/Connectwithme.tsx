@@ -4,8 +4,6 @@ import { useRef } from 'react';
 import { JSX } from 'react';
 import { useEmail, useMessage, useSendMessage } from '@/store/Connectwithme';
 import axios from 'axios';
-import { FaXTwitter } from 'react-icons/fa6';
-import { GrSchedules } from 'react-icons/gr';
 import { toast } from 'sonner';
 
 const Connectwithme: React.FC = (): JSX.Element => {
@@ -73,31 +71,6 @@ const Connectwithme: React.FC = (): JSX.Element => {
     <div className="mx-auto flex h-[380px] flex-col items-start p-4 lg:h-[460px] lg:w-[750px]">
       <div className="mx-auto mb-2 text-[20px] font-semibold lg:mb-5 lg:text-[30px]">
         Connect with me
-      </div>
-
-      <div className="mb-1 flex h-[40px] w-full justify-start gap-x-[8px] p-1 lg:h-[50px] lg:gap-x-[12px]">
-        <button
-          className="flex h-[28px] w-[130px] cursor-pointer items-center justify-center rounded-[4px] bg-emerald-400 p-[2px] text-[10px] font-medium text-black/80 hover:bg-emerald-400/90 lg:h-[38px] lg:w-[175px] lg:rounded-[6px] lg:text-[14px] dark:text-black/80"
-          onClick={() =>
-            window.open('https://cal.com/abdullah23/15min?overlayCalendar=true', '_blank')
-          }
-        >
-          <GrSchedules className="mr-[5px] text-center text-[16px] lg:text-[18px]" />
-          Schedule a Meeting
-        </button>
-
-        <button
-          className="flex h-[28px] w-[114px] cursor-pointer items-center justify-center rounded-[4px] bg-blue-400 p-[2px] text-[10px] font-medium text-white/90 hover:bg-blue-400/95 lg:h-[38px] lg:w-[140px] lg:rounded-[6px] lg:text-[14px] dark:text-white/80"
-          onClick={() =>
-            window.open(
-              'https://twitter.com/messages/compose?recipient_id=abdullah_twt23',
-              '_black'
-            )
-          }
-        >
-          <FaXTwitter className="mr-[4px] text-center text-[16px] lg:text-[18px]" />
-          Chat on Twitter
-        </button>
       </div>
 
       <div className="p-[2px] text-[14px] font-stretch-ultra-condensed lg:pb-[8px] lg:text-[16px]">

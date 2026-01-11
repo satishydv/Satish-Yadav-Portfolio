@@ -7,9 +7,6 @@ import { motion } from 'motion/react';
 import { Animation, Transition } from '@/lib/animation';
 
 const Introsec: FC = (): JSX.Element => {
-  const openCal = () => {
-    window.open('https://cal.com/abdullah23/15min?overlayCalendar=true', '_blank');
-  };
 
   const scrollDown = () => {
     const scrollTarget = window.innerWidth > 1500 ? 5000 : 6000;
@@ -76,7 +73,7 @@ const Introsec: FC = (): JSX.Element => {
         transition={Transition(1.45)}
         className="mt-[30px] flex space-x-4 lg:mt-[40px] lg:space-x-6"
       >
-        <Button prop="Book a Meet" onClick={openCal} />
+        <Button prop="Book a Meet" />
         <Button prop="Get in Touch" onClick={scrollDown} />
       </motion.div>
     </div>
