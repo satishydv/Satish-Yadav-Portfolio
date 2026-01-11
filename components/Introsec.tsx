@@ -18,14 +18,14 @@ const Introsec: FC = (): JSX.Element => {
       <motion.div
         {...Animation}
         transition={Transition(0.6)}
-        className="relative flex h-[70px] w-[95px] justify-center lg:h-[110px] lg:w-[140px]"
+        className="relative mb-4 flex h-[180px] w-[180px] justify-center lg:h-[260px] lg:w-[260px]"
       >
         <Image
-          alt="me"
-          src="/me.webp"
+          alt="hero"
+          src="/hero2.png"
           onClick={() => window.open('https://github.com/satishydv', '_blank')}
           fill
-          className="rounded-lg object-cover"
+          className="object-contain"
           priority
         />
       </motion.div>
@@ -46,8 +46,8 @@ const Introsec: FC = (): JSX.Element => {
         transition={Transition(1.15)}
         className="px-4 pt-1 text-center text-[13px] lg:text-[16px]"
       >
-        Hey folks I am Satish, a Software Engineer hooked on crafting products using Typescript
-        and Go.
+        Hey folks I am Satish, a Software Developer hooked on crafting products using Typescript
+        and Node.js.
       </motion.div>
 
       <motion.div
