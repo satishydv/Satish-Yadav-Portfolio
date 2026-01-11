@@ -2,8 +2,8 @@ export const projects = [
   {
     title: 'PurgeAI',
     desc: 'Purge AI is an AI-powered tool that analyzes GitHub PRs using LLMs and metadata extraction. It streamlines developer workflows with accurate labeling, concise summaries, and dynamic adaptation to different repositories, boosting speed, consistency, and review efficiency.',
-    srcLink: 'https://github.com/satishydv/purge.ai',
-    webLink: 'https://purgeai.abdullahtech.dev',
+    srcLink: 'https://github.com/satishydv/ai-resume-analyzer',
+    webLink: 'https://ai-resume-analyzer-lime-chi.vercel.app/',
     skills: [
       'Typescript',
       'React',
@@ -22,7 +22,7 @@ export const projects = [
     title: 'Privado',
     desc: 'Privado is a fast, secure private chat app powered by Socket.IO. Instantly connect, message friends, and enjoy real-time private conversations with no distractions. Simple, smooth, and built for people who value privacy and speed.',
     srcLink: 'https://github.com/satishydv/Web-Socket-Server-Sets',
-    webLink: 'https://privado.abdullahtech.dev',
+    webLink: 'https://ecommerce-2-rose.vercel.app/',
     skills: [
       'Typescript',
       'React',
@@ -68,7 +68,7 @@ export const projects = [
     title: 'Cat Capture',
     desc: 'Capture your cats attention my simply playing the sounds you wanna talk with, its a simple fun side project i made only because i love my cat so much.',
     srcLink: 'https://github.com/satishydv/Meoww',
-    webLink: 'https://meoww.abdullahtech.dev/',
+    webLink: 'https://stock-tracker-app-ten.vercel.app/',
     skills: [
       'Typescript',
       'Next js',

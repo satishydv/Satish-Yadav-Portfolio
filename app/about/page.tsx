@@ -13,14 +13,14 @@ const About: React.FC = (): JSX.Element => {
 
   const aboutArr: Array<AboutType> = [
     {
-      year: 2023,
+      year: 2025,
       desc: [
-        'Got myself enrolled in Summer Internship actuallt 3 internships where i worked with industry folks and learned new stuff',
+        'Got myself enrolled in Summer Internship actuallt 2 internships where i worked with industry folks and learned new stuff',
         `Made an adventure sports travel app which helps folks in hiking, offroading, offboating and many other cool things with features like offline maps, live tracking and many more.`,
       ],
     },
     {
-      year: 2022,
+      year: 2024,
       desc: [
         `Made some more projects in Android but now its time to move Tech Stacks. I explored Web, the ultimate niche
             atleast for me, this actually hit the spot and i started to like coding.`,
@@ -30,19 +30,11 @@ const About: React.FC = (): JSX.Element => {
             its a very proud feeling.`,
       ],
     },
+    
     {
-      year: 2021,
+      year: 2023,
       desc: [
-        `In my second year, I worked on Android development projects using Java, but I did them mainly 
-        for project marks and didn't really develop a passion for programming.`,
-
-        `Later I got introduced with DSA and did some of it to sharpen my problem solving skills.`,
-      ],
-    },
-    {
-      year: 2020,
-      desc: [
-        `Joined my Computer Science Engineering Degree in Pillai College of Engineering and Technology.`,
+        `Joined my Bachelor of Computer Application Degree in Jharkhand Rai University.`,
 
         `Get myself around technologies and core engineering and The exploration phase started from there `,
       ],
