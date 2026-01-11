@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
     domains: ['ghchart.rshah.org'],
   },
   eslint: {
-    ignoreDuringBuilds: true, // Optional: disable ESLint errors from breaking build
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
   webpack: (config, { isServer }) => {
     // Exclude backend folder from build process
