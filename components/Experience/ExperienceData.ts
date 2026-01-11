@@ -17,9 +17,9 @@ const experience: ExpTypes[] = [
   {
     org: 'Inkhub',
     duration: 'April - August 2025',
-    logo: '/company/kannect.png',
+    logo: '/company/inkhub.png',
     role: 'Fullstack Developer Intern',
-    link: 'https://kannect.co/',
+    link: 'https://inkhub.co/',
     desc: [
       'Implemented automatic Algolia indexing with AWS Lambda and API Gateway streaming CRUD events.',
       'Refined the front-end for Inkhub’s Admin website, ensuring responsive, and reducing bounce rates by about 35%.',
