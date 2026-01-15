@@ -12,7 +12,7 @@ const Footer = () => {
     >
       Designed and Developed by
       <Link
-        className="ml-1.5 rounded-xs bg-neutral-200 px-[6px] py-[1px] font-normal text-neutral-950 dark:bg-neutral-800 dark:text-neutral-100"
+        className="ml-1.5 rounded-sm bg-[#E0F2FE] px-[6px] py-[1px] font-medium text-[#0369a1] transition-transform hover:scale-110 lg:px-2 lg:py-0.5 dark:bg-[#0369a1]/20 dark:text-[#E0F2FE]"
         href="https://x.com/abdullah_twt23"
         target="_black"
       >

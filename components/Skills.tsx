@@ -22,7 +22,7 @@ const skills: Array<{ name: string; color: string }> = [
 
 const Skills: React.FC = () => {
   return (
-    <div className="mx-auto mb-[40px] h-[110px] w-[350px] lg:mb-[40px] lg:h-[160px] lg:w-[760px]">
+    <div className="mx-auto mb-[40px] h-auto w-[350px] lg:mb-[60px] lg:w-[760px]">
       <div className="mx-auto mb-[10px] text-center text-[20px] font-semibold text-black lg:mb-[18px] lg:p-[2px] lg:text-[30px] dark:text-white">
         Skills
       </div>

@@ -55,7 +55,7 @@ const About: React.FC = (): JSX.Element => {
     },
   ];
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 pb-20">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-20">
       <div className="mx-auto mt-[140px] max-w-[1000px] px-6 relative">
         {/* Connecting Lines (Desktop only) */}
         <div className="absolute top-20 left-1/2 -ml-[1px] h-[calc(100%-200px)] w-[2px] border-l-2 border-dotted border-black/10 hidden md:block" />
