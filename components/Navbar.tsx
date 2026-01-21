@@ -74,7 +74,7 @@ const Navbar: React.FC = (): JSX.Element => {
           </span>
 
           <Link
-            href="https://drive.google.com/file/d/1cdkKOhinDtRImdETdWxjdlw-lRokX9t9/view?usp=drivesdk"
+            href="https://drive.google.com/file/d/1EY671aZ4ZXj3l7rghQiitJACQmF_1xhM/view?usp=sharing"
             target="_blank"
             underline="none"
           >
