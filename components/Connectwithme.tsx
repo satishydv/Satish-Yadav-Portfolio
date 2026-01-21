@@ -52,7 +52,7 @@ const Connectwithme: React.FC = (): JSX.Element => {
     try {
       setSendMessage(true);
       const res = await axios.post(
-        'https://portfolio-backend-ten-ebon.vercel.app/api/sendmessage',
+        '/api/sendmessage',
         { email, message }
       );
 
