@@ -60,10 +60,13 @@ const Connectwithme: React.FC = (): JSX.Element => {
         setSendMessage(false);
         handleMessageSuccess();
       } else {
+        setSendMessage(false);
         handleMessageError();
       }
     } catch (error) {
       console.log('Error occured while sending message', error);
+      setSendMessage(false);
+      handleMessageError();
     }
   };
 

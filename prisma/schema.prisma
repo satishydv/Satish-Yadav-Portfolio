@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  message   String
+  createdAt DateTime @default(now())
+
+  @@map("users")
+}
+
+model Visitor {
+  id          String   @id @default(uuid())
+  fingerprint String   @unique
+  cookieId    String?  @unique
+  visitDate   DateTime @default(now())
+  userAgent   String
+  ipHash      String
+  isBot       Boolean  @default(false)
+
+  @@index([fingerprint])
+  @@index([cookieId])
+  @@index([visitDate])
+  @@map("visitors")
+}

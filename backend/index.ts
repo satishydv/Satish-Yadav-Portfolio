@@ -68,7 +68,7 @@ app.post('/api/sendmessage', async (req: Request<{}, {}, UserBody>, res: any) =>
       .replace('{{date}}', getDate());
 
     await resend.emails.send({
-      from: 'contact@abdullahtech.dev',
+      from: 'onboarding@resend.dev',
       to: 'thesatishydv@gmail.com',
       subject: `Hey Satish you got a message from ${email}`,
       html: htmlTemplate,
