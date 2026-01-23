@@ -7,7 +7,7 @@ import { DarkmodeProvider } from '@/store/DarkmodeProvider';
 import '@radix-ui/themes/styles.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://satishydv.dev'),
+  metadataBase: new URL('https://satishydv.tech'),
   title: 'Satish Yadav | Fullstack Engineer',
   icons: {
     icon: '/company/favicon.ico',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Satish Yadav Portfolio',
     description: 'Portfolio of Satish Yadav, a Fullstack Engineer',
-    url: 'https://satish-yadav-portfolio.vercel.app/',
+    url: 'https://satishydv.tech/',
     siteName: 'Satish Yadav',
     images: [
       {
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
 
   appLinks: {
     web: {
-      url: new URL('https://satish-yadav-portfolio.vercel.app/'),
+      url: new URL('https://satishydv.tech/'),
     },
   },
 
