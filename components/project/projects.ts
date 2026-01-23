@@ -2,7 +2,7 @@ export const projects = [
   {
     title: 'Gitale',
     desc: "GitTale is a story-driven visualization tool for GitHub repositories. It transforms boring commit history into a readable, gamified narrative timeline with RPG-style elements, achievements, and unique collectibles and passport generation in differebt styles like cyberpunk, pixel art, etc.",
-    srcLink: 'https://github.com/satishydv/Github-Metrics',
+    srcLink: 'https://github.com/satishydv/GITTALE',
     webLink: 'https://gittale-omega.vercel.app/',
     skills: ['Typescript', 'React', 'Express', 'TailwindCSS', 'Vite', 'Gemini', 'Zustand'],
     imgLink: '/projects/githublogo.png',
