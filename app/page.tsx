@@ -10,6 +10,7 @@ import Experience from '@/components/Experience/Experience';
 import { Bricolage } from '@/utils/fonts';
 import { cn } from '@/lib/utils';
 import useSmoothScroll from '@/components/useSmoothScroll';
+import VisitorSection from '@/components/VisitorSection';
 
 export default function Home() {
   useSmoothScroll();
@@ -22,6 +23,7 @@ export default function Home() {
         <Github />
         <Skills />
         <Connectwithme />
+        <VisitorSection />
         <Footer />
       </div>
     </div>
