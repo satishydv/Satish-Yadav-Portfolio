@@ -22,7 +22,7 @@ const Introsec: FC = (): JSX.Element => {
       >
         <Image
           alt="hero"
-          src="/hero2.png"
+          src="/hero1.png"
           onClick={() => window.open('https://github.com/satishydv', '_blank')}
           fill
           className="object-contain"

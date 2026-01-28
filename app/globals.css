@@ -39,13 +39,16 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-shine: shine var(--duration) infinite linear;
+
   @keyframes shine {
     0% {
       background-position: 0% 0%;
     }
+
     50% {
       background-position: 100% 100%;
     }
+
     to {
       background-position: 0% 0%;
     }
@@ -125,25 +128,30 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 .mask-scalloped {
-  --s: 40px; /* size of the scalloped */
-  --r: 20px; /* radius of the circle */
+  --s: 40px;
+  /* size of the scalloped */
+  --r: 20px;
+  /* radius of the circle */
 
-  mask: 
-    radial-gradient(var(--r) at var(--r) 50%,#000 98%,#0000) 0 0/var(--s) 100%,
-    linear-gradient(90deg,#0000 var(--r),#000 0 calc(100% - var(--r)),#0000 0);
+  mask:
+    radial-gradient(var(--r) at var(--r) 50%, #000 98%, #0000) 0 0/var(--s) 100%,
+    linear-gradient(90deg, #0000 var(--r), #000 0 calc(100% - var(--r)), #0000 0);
 }
 
 .mask-scalloped-v {
-  --s: 60px; /* size of the scalloped */
-  --r: 30px; /* radius of the circle */
+  --s: 60px;
+  /* size of the scalloped */
+  --r: 30px;
+  /* radius of the circle */
 
-  mask: 
-    radial-gradient(var(--r) at 50% var(--r),#000 98%,#0000) 0 0/100% var(--s),
-    linear-gradient(#0000 var(--r),#000 0 calc(100% - var(--r)),#0000 0);
+  mask:
+    radial-gradient(var(--r) at 50% var(--r), #000 98%, #0000) 0 0/100% var(--s),
+    linear-gradient(#0000 var(--r), #000 0 calc(100% - var(--r)), #0000 0);
 }
