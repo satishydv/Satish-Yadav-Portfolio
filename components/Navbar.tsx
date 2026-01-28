@@ -22,8 +22,10 @@ const Navbar: React.FC = (): JSX.Element => {
   const { isDarkmode, toggleDarkmode } = useDarkmode();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
+    setIsMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -54,12 +56,12 @@ const Navbar: React.FC = (): JSX.Element => {
     <nav className="fixed top-6 z-50 flex w-full justify-center pointer-events-none">
       <div className="pointer-events-auto">
         <Dock
-          baseSize={isMobile ? 32 : 40}
-          baseIconSize={isMobile ? 18 : 20}
-          magnification={isMobile ? 0 : 60}
+          baseSize={!isMounted ? 40 : (isMobile ? 32 : 40)}
+          baseIconSize={!isMounted ? 20 : (isMobile ? 18 : 20)}
+          magnification={!isMounted ? 60 : (isMobile ? 0 : 60)}
           className={cn(
             "!w-fit !h-14 !mx-auto bg-sky-400/10 border-sky-300/50 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:bg-sky-900/20 dark:border-sky-500/30 dark:shadow-none items-center transition-all duration-300",
-            isMobile ? "px-2 gap-1.5" : "px-3 gap-2"
+            (!isMounted || !isMobile) ? "px-3 gap-2" : "px-2 gap-1.5"
           )}
         >
           {navItems.map((item) => (
