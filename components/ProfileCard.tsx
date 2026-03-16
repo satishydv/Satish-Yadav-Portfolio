@@ -349,8 +349,23 @@ const ProfileCardComponent = ({
   );
 
   const handleContactClick = useCallback(() => {
+    const card = cardRef.current;
+    const wrap = wrapRef.current;
+
+    if (leaveTimeoutRef.current != null) {
+      window.clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+
+    if (card && wrap) {
+      animationHandlers?.cancelAnimation();
+      wrap.classList.remove('active');
+      card.classList.remove('active');
+      animationHandlers?.updateCardTransform(wrap.clientWidth / 2, wrap.clientHeight / 2, card, wrap);
+    }
+
     onContactClick?.();
-  }, [onContactClick]);
+  }, [animationHandlers, onContactClick]);
 
   return (
     <div ref={wrapRef} className={`pc-card-wrapper ${className}`.trim()} style={cardStyle}>
