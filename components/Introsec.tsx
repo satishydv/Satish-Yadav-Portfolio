@@ -2,7 +2,7 @@
 
 import { JSX, FC } from 'react';
 import Button from '../components/Button';
-import Image from 'next/image';
+import ProfileCard from '@/components/ProfileCard';
 import { motion } from 'motion/react';
 import { Animation, Transition } from '@/lib/animation';
 
@@ -14,19 +14,25 @@ const Introsec: FC = (): JSX.Element => {
   };
 
   return (
-    <div className="mt-[120px] flex flex-col items-center justify-center bg-neutral-50 text-neutral-900 lg:mt-26 lg:h-[500px] dark:bg-neutral-950 dark:text-white/90">
+    <div className="mt-[136px] flex flex-col items-center justify-center bg-neutral-50 text-neutral-900 sm:mt-[148px] lg:mt-[145px] lg:h-[500px] dark:bg-neutral-950 dark:text-white/90">
       <motion.div
         {...Animation}
         transition={Transition(0.6)}
-        className="relative mb-4 flex h-[180px] w-[180px] justify-center lg:h-[260px] lg:w-[260px]"
+        className="relative mt-2 mb-6 flex w-[220px] justify-center sm:mt-6 sm:w-[240px] lg:mt-8 lg:mb-8 lg:w-[270px]"
       >
-        <Image
-          alt="hero"
-          src="/hero1.png"
-          onClick={() => window.open('https://github.com/satishydv', '_blank')}
-          fill
-          className="object-contain"
-          priority
+        <ProfileCard
+          className="pc-card--hero"
+          name="Satish Yadav"
+          title="Web Developer"
+          handle="satishyadav"
+          status="Online"
+          contactText="Contact Me"
+          avatarUrl="/assets/satish.png"
+          miniAvatarUrl="/assets/satish.png"
+          showUserInfo={true}
+          enableTilt={true}
+          enableMobileTilt={false}
+          onContactClick={() => window.open('https://github.com/satishydv', '_blank')}
         />
       </motion.div>
 
