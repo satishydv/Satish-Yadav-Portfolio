@@ -92,6 +92,7 @@ const ProfileCardComponent = ({
   const wrapRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const pointerOffsetRef = useRef({ x: 0, y: 0 });
+  const leaveTimeoutRef = useRef<number | null>(null);
 
   const animationHandlers = useMemo<AnimationHandlers | null>(() => {
     if (!enableTilt) return null;
@@ -199,6 +200,11 @@ const ProfileCardComponent = ({
 
     if (!card || !wrap || !animationHandlers) return;
 
+    if (leaveTimeoutRef.current != null) {
+      window.clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+
     animationHandlers.cancelAnimation();
     wrap.classList.add('active');
     card.classList.add('active');
@@ -220,8 +226,16 @@ const ProfileCardComponent = ({
         card,
         wrap
       );
-      wrap.classList.remove('active');
-      card.classList.remove('active');
+
+      if (leaveTimeoutRef.current != null) {
+        window.clearTimeout(leaveTimeoutRef.current);
+      }
+
+      leaveTimeoutRef.current = window.setTimeout(() => {
+        wrap.classList.remove('active');
+        card.classList.remove('active');
+        leaveTimeoutRef.current = null;
+      }, ANIMATION_CONFIG.SMOOTH_DURATION);
     },
     [animationHandlers]
   );
@@ -305,6 +319,11 @@ const ProfileCardComponent = ({
       wrap.removeEventListener('click', handleClick);
       window.removeEventListener('deviceorientation', deviceOrientationHandler);
       animationHandlers.cancelAnimation();
+
+      if (leaveTimeoutRef.current != null) {
+        window.clearTimeout(leaveTimeoutRef.current);
+        leaveTimeoutRef.current = null;
+      }
     };
   }, [
     enableTilt,

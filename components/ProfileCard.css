@@ -151,6 +151,13 @@
   pointer-events: none;
 }
 
+.pc-user-info,
+.pc-user-details,
+.pc-user-text {
+  display: flex;
+  grid-area: auto;
+}
+
 .pc-inside {
   inset: 1px;
   position: absolute;
@@ -168,7 +175,7 @@
   mask-size: 150%;
   mask-position: top calc(200% - (var(--background-y) * 5)) left calc(100% - var(--background-x));
   transition: filter 0.6s ease;
-  filter: brightness(0.88) contrast(1.35) saturate(1.05) opacity(0.8);
+  filter: brightness(0.66) contrast(1.33) saturate(0.33) opacity(0.5);
   animation: holo-bg 18s linear infinite;
   mix-blend-mode: color-dodge;
   backface-visibility: hidden;
@@ -228,8 +235,12 @@
 
 .pc-card:hover .pc-shine,
 .pc-card.active .pc-shine {
-  filter: brightness(1.05) contrast(1.45) saturate(1.25);
+  filter: brightness(0.85) contrast(1.5) saturate(0.5);
   animation: none;
+}
+
+.pc-card:not(:hover):not(.active) .pc-shine {
+  filter: brightness(0.88) contrast(1.35) saturate(1.05) opacity(0.8);
 }
 
 .pc-card:hover .pc-shine::before,
@@ -289,12 +300,17 @@
 }
 
 .pc-avatar-content {
-  mix-blend-mode: normal;
+  mix-blend-mode: screen;
   overflow: hidden;
+}
+
+.pc-card:not(:hover):not(.active) .pc-avatar-content {
+  mix-blend-mode: normal;
 }
 
 .pc-avatar-content .avatar {
   width: 100%;
+  display: block;
   position: absolute;
   left: 50%;
   transform: translate3d(-50%, 0, 0.2px) scale(1);
@@ -303,6 +319,8 @@
   will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform: translate3d(-50%, 0, 0.2px) scale(1);
 }
 
 .pc-avatar-content::before {
@@ -359,8 +377,12 @@
 .pc-mini-avatar img {
   width: 100%;
   height: 100%;
+  display: block;
   object-fit: cover;
   border-radius: 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .pc-user-text {
@@ -415,6 +437,10 @@
     0.1px
   ) !important;
   z-index: 5;
+  mix-blend-mode: luminosity;
+}
+
+.pc-card:not(:hover):not(.active) .pc-content {
   mix-blend-mode: normal;
 }
 
