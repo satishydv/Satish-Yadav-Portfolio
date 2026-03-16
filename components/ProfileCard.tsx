@@ -83,7 +83,7 @@ const ProfileCardComponent = ({
   miniAvatarUrl,
   name = 'Satish Yadav',
   title = 'Web Developer',
-  handle = 'satishyadav',
+  handle = 'satishydv',
   status = 'Online',
   contactText = 'Contact Me',
   showUserInfo = true,

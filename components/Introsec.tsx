@@ -32,7 +32,9 @@ const Introsec: FC = (): JSX.Element => {
           showUserInfo={true}
           enableTilt={true}
           enableMobileTilt={false}
-          onContactClick={() => window.open('https://github.com/satishydv', '_blank')}
+          onContactClick={() => {
+            window.location.href = 'tel:+916204812279';
+          }}
         />
       </motion.div>
 

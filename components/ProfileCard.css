@@ -500,8 +500,8 @@
 
 @media (max-width: 768px) {
   .pc-card-wrapper.pc-card--hero .pc-card {
-    height: clamp(280px, 46svh, 360px);
-    max-height: 360px;
+    height: clamp(322px, 53svh, 414px);
+    max-height: 414px;
   }
 
   .pc-card {
@@ -575,30 +575,7 @@
 
   .pc-card-wrapper.pc-card--hero .pc-handle {
     font-size: 9px;
-    max-width: 56px;
-  }
-
-  .pc-card-wrapper.pc-card--hero .pc-status {
-    font-size: 9px;
-  }
-
-  .pc-card-wrapper.pc-card--hero .pc-contact-btn {
-    font-size: 9px;
-    padding: 4px 7px;
-    min-width: 72px;
-    text-align: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .pc-card-wrapper.pc-card--hero .pc-card {
-    height: clamp(250px, 42svh, 320px);
-    max-height: 320px;
-  }
-
-  .pc-card-wrapper.pc-card--hero .pc-handle {
-    max-width: 52px;
-    font-size: 9px;
+    max-width: 84px;
   }
 
   .pc-card-wrapper.pc-card--hero .pc-status {
@@ -608,7 +585,30 @@
   .pc-card-wrapper.pc-card--hero .pc-contact-btn {
     font-size: 9px;
     padding: 4px 6px;
-    min-width: 68px;
+    min-width: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .pc-card-wrapper.pc-card--hero .pc-card {
+    height: clamp(288px, 48svh, 368px);
+    max-height: 368px;
+  }
+
+  .pc-card-wrapper.pc-card--hero .pc-handle {
+    max-width: 78px;
+    font-size: 9px;
+  }
+
+  .pc-card-wrapper.pc-card--hero .pc-status {
+    font-size: 9px;
+  }
+
+  .pc-card-wrapper.pc-card--hero .pc-contact-btn {
+    font-size: 9px;
+    padding: 4px 5px;
+    min-width: 0;
   }
 
   .pc-card {
