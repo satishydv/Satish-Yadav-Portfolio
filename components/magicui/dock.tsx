@@ -2,9 +2,9 @@
 
 import { cn } from "@/lib/utils";
 import { motion, type MotionValue, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { createContext, useContext, useRef, type ReactNode } from "react";
+import { createContext, useContext, useRef, type HTMLAttributes, type ReactNode } from "react";
 
-interface DockProps {
+interface DockProps extends HTMLAttributes<HTMLDivElement> {
     className?: string;
     children: ReactNode;
     magnification?: number;
@@ -42,6 +42,7 @@ const Dock = ({
     distance = DEFAULT_DISTANCE,
     baseSize = DEFAULT_BASE_SIZE,
     baseIconSize = DEFAULT_BASE_ICON_SIZE,
+    ...props
 }: DockProps) => {
     const mouseX = useMotionValue(Infinity);
 
@@ -50,6 +51,7 @@ const Dock = ({
             <motion.div
                 onMouseMove={(e) => mouseX.set(e.pageX)}
                 onMouseLeave={() => mouseX.set(Infinity)}
+                {...props}
                 className={cn(
                     "mx-auto w-fit h-full flex items-center justify-center overflow-visible rounded-full border",
                     className
