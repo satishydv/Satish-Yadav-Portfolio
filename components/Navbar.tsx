@@ -60,7 +60,12 @@ const Navbar: React.FC = (): JSX.Element => {
           baseIconSize={!isMounted ? 20 : (isMobile ? 18 : 20)}
           magnification={!isMounted ? 60 : (isMobile ? 0 : 60)}
           className={cn(
-            "!w-fit !h-14 !mx-auto bg-sky-400/10 border-sky-300/50 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:bg-sky-900/20 dark:border-sky-500/30 dark:shadow-none items-center transition-all duration-300",
+            "!w-fit !h-14 !mx-auto items-center transition-all duration-300",
+            "relative overflow-hidden rounded-full border border-white/40 bg-white/10 backdrop-blur-2xl",
+            "shadow-[inset_0_1px_0px_rgba(255,255,255,0.75),0_10px_30px_rgba(0,0,0,0.18)]",
+            "before:content-[''] before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/60 before:via-transparent before:to-transparent before:opacity-70 before:pointer-events-none",
+            "after:content-[''] after:absolute after:inset-0 after:rounded-full after:bg-gradient-to-tl after:from-white/30 after:via-transparent after:to-transparent after:opacity-50 after:pointer-events-none",
+            "dark:border-white/15 dark:bg-white/5 dark:shadow-[inset_0_1px_0px_rgba(255,255,255,0.35),0_12px_28px_rgba(0,0,0,0.35)]",
             (!isMounted || !isMobile) ? "px-3 gap-2" : "px-2 gap-1.5"
           )}
         >
@@ -68,8 +73,12 @@ const Navbar: React.FC = (): JSX.Element => {
             <Tooltip key={item.href} content={item.label}>
               <Link href={item.href} underline="none" className="flex items-center">
                 <DockIcon className={cn(
-                  "bg-sky-400/5 border border-sky-300/30 backdrop-blur-md dark:bg-sky-900/10 dark:border-sky-500/20 transition-all",
-                  "hover:bg-sky-400/20 dark:hover:bg-sky-900/40"
+                  "relative overflow-hidden rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition-all",
+                  "shadow-[inset_0_1px_0px_rgba(255,255,255,0.7),0_6px_14px_rgba(0,0,0,0.18)]",
+                  "before:content-[''] before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/60 before:via-transparent before:to-transparent before:opacity-70 before:pointer-events-none",
+                  "after:content-[''] after:absolute after:inset-0 after:rounded-full after:bg-gradient-to-tl after:from-white/30 after:via-transparent after:to-transparent after:opacity-50 after:pointer-events-none",
+                  "hover:bg-white/25",
+                  "dark:border-white/15 dark:bg-white/5 dark:hover:bg-white/15"
                 )}>
                   <item.icon
                     className={cn(
@@ -82,14 +91,18 @@ const Navbar: React.FC = (): JSX.Element => {
             </Tooltip>
           ))}
 
-          <Separator orientation="vertical" className="h-2/3 m-auto w-px bg-sky-300/50 dark:bg-sky-500/30" />
+          <Separator orientation="vertical" className="h-2/3 m-auto w-px bg-white/40 dark:bg-white/20" />
 
           {socialItems.map((item) => (
             <Tooltip key={item.href} content={item.label}>
               <Link href={item.href} target="_blank" underline="none" className="flex items-center">
                 <DockIcon className={cn(
-                  "bg-sky-400/5 border border-sky-300/30 backdrop-blur-md dark:bg-sky-900/10 dark:border-sky-500/20 transition-all",
-                  "hover:bg-sky-400/20 dark:hover:bg-sky-900/40"
+                  "relative overflow-hidden rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition-all",
+                  "shadow-[inset_0_1px_0px_rgba(255,255,255,0.7),0_6px_14px_rgba(0,0,0,0.18)]",
+                  "before:content-[''] before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/60 before:via-transparent before:to-transparent before:opacity-70 before:pointer-events-none",
+                  "after:content-[''] after:absolute after:inset-0 after:rounded-full after:bg-gradient-to-tl after:from-white/30 after:via-transparent after:to-transparent after:opacity-50 after:pointer-events-none",
+                  "hover:bg-white/25",
+                  "dark:border-white/15 dark:bg-white/5 dark:hover:bg-white/15"
                 )}>
                   <item.icon className="size-full text-black dark:text-white" />
                 </DockIcon>
@@ -97,13 +110,17 @@ const Navbar: React.FC = (): JSX.Element => {
             </Tooltip>
           ))}
 
-          <Separator orientation="vertical" className="h-2/3 m-auto w-px bg-sky-300/50 dark:bg-sky-500/30" />
+          <Separator orientation="vertical" className="h-2/3 m-auto w-px bg-white/40 dark:bg-white/20" />
 
           <Tooltip content="Theme">
             <button onClick={toggleDarkmode} className="outline-none flex items-center">
               <DockIcon className={cn(
-                "bg-sky-400/5 border border-sky-300/30 backdrop-blur-md dark:bg-sky-900/10 dark:border-sky-500/20 transition-all",
-                "hover:bg-sky-400/20 dark:hover:bg-sky-900/40"
+                "relative overflow-hidden rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition-all",
+                "shadow-[inset_0_1px_0px_rgba(255,255,255,0.7),0_6px_14px_rgba(0,0,0,0.18)]",
+                "before:content-[''] before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/60 before:via-transparent before:to-transparent before:opacity-70 before:pointer-events-none",
+                "after:content-[''] after:absolute after:inset-0 after:rounded-full after:bg-gradient-to-tl after:from-white/30 after:via-transparent after:to-transparent after:opacity-50 after:pointer-events-none",
+                "hover:bg-white/25",
+                "dark:border-white/15 dark:bg-white/5 dark:hover:bg-white/15"
               )}>
                 {isDarkmode === 'dark' ? (
                   <Moon className="size-full text-white" />
