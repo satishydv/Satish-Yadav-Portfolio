@@ -156,3 +156,42 @@
     radial-gradient(var(--r) at 50% var(--r), #000 98%, #0000) 0 0/100% var(--s),
     linear-gradient(#0000 var(--r), #000 0 calc(100% - var(--r)), #0000 0);
 }
+
+.home-flower {
+  animation: home-flower-spin 4.8s cubic-bezier(0.16, 1, 0.3, 1) 0.12s 1 both;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.home-flower-left {
+  --home-flower-offset-x: -50%;
+  --home-flower-final-rotate: -8deg;
+  --home-flower-spin-rest: 712deg;
+}
+
+.home-flower-right {
+  --home-flower-offset-x: 33.333333%;
+  --home-flower-final-rotate: 10deg;
+  --home-flower-spin-rest: 730deg;
+}
+
+@keyframes home-flower-spin {
+  from {
+    transform: translateX(var(--home-flower-offset-x)) rotate(0deg);
+  }
+
+  68% {
+    transform: translateX(var(--home-flower-offset-x)) rotate(640deg);
+  }
+
+  to {
+    transform: translateX(var(--home-flower-offset-x)) rotate(var(--home-flower-spin-rest));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-flower {
+    animation: none;
+    transform: translateX(var(--home-flower-offset-x)) rotate(var(--home-flower-final-rotate));
+  }
+}

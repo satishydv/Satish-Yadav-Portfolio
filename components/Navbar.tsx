@@ -139,14 +139,14 @@ const Navbar: React.FC = (): JSX.Element => {
           <filter id="dockDisplacement">
             <feTurbulence
               type="turbulence"
-              baseFrequency="0.004"
+              baseFrequency="0.0035"
               numOctaves="2"
               result="turbulence"
             />
             <feDisplacementMap
               in="SourceGraphic"
               in2="turbulence"
-              scale="22"
+              scale="24"
               xChannelSelector="R"
               yChannelSelector="G"
             />
