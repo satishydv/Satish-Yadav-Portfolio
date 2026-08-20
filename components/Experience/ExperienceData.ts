@@ -2,11 +2,11 @@ import { type ExpTypes } from '@/types/components/experience-types';
 
 const experience: ExpTypes[] = [
   {
-    org: 'ABO Infotech Pvt. Ltd.',
-    duration: 'September 2025 - Present',
+    org: 'CK Infynity',
+    duration: 'November 2025 - Present',
     logo: '/company/sylow.png',
-    role: 'UI/UX Designer + Full Stack Developer',
-    link: 'https://www.sylow.ai/',
+    role: 'Full Stack Developer',
+    link: 'https://ckinfynity.com/',
     desc: [
       'Developed and completed 10 + Projects using Mern Stack and NextJS.',
       'Designed responsive and user-friendly interfaces, leveraging modern UI/UX principles.',
@@ -16,9 +16,9 @@ const experience: ExpTypes[] = [
   },
   {
     org: 'Inkhub',
-    duration: 'April - August 2025',
+    duration: 'June - September 2025',
     logo: '/company/inkhub.png',
-    role: 'Fullstack Developer Intern',
+    role: 'Frontend Developer Intern',
     link: 'https://inkhub.co/',
     desc: [
       'Implemented automatic Algolia indexing with AWS Lambda and API Gateway streaming CRUD events.',
