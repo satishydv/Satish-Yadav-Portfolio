@@ -5,8 +5,11 @@ import Button from '../components/Button';
 import ProfileCard from '@/components/ProfileCard';
 import { motion } from 'motion/react';
 import { Animation, Transition } from '@/lib/animation';
+import { usePortfolioContent } from '@/store/usePortfolioContent';
 
 const Introsec: FC = (): JSX.Element => {
+  const { content } = usePortfolioContent();
+  const { profile } = content;
 
   const scrollDown = () => {
     const scrollTarget = window.innerWidth > 1500 ? 5000 : 6000;
@@ -22,10 +25,10 @@ const Introsec: FC = (): JSX.Element => {
       >
         <ProfileCard
           className="pc-card--hero"
-          name="Satish Yadav"
-          title="Web Developer"
-          handle="satishyadav"
-          status="Online"
+          name={profile.name}
+          title={profile.role}
+          handle={profile.handle}
+          status={profile.availability}
           contactText="Contact Me"
           avatarUrl="/assets/satish.png"
           miniAvatarUrl="/assets/satish.png"
@@ -45,7 +48,7 @@ const Introsec: FC = (): JSX.Element => {
       >
         Hey, I&apos;m{' '}
         <span className="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent dark:from-cyan-300 dark:to-emerald-300">
-          Satish Yadav
+          {profile.name}
         </span>
       </motion.div>
 
@@ -54,8 +57,7 @@ const Introsec: FC = (): JSX.Element => {
         transition={Transition(1.15)}
         className="px-4 pt-1 text-center text-[13px] lg:text-[16px]"
       >
-        Hey folks I am Satish, a Software Developer hooked on crafting products using Typescript
-        and Node.js.
+        {profile.intro}
       </motion.div>
 
       <motion.div

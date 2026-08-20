@@ -5,18 +5,18 @@ import { Bricolage } from '@/utils/fonts';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion } from 'motion/react';
-import { projects } from '@/components/project/projects';
-import { useState } from 'react';
-import { Loadbtn } from '@/components/project/Loadbtn';
 import { cn } from '@/lib/utils';
 import { Animation, Transition } from '@/lib/animation';
+import { usePortfolioContent } from '@/store/usePortfolioContent';
 // import { ChevronDownIcon } from '@radix-ui/themes';
 // import { ChevronUpIcon } from '@radix-ui/react-icons';
 
 const Projects = () => {
   const pathname = usePathname();
+  const { content } = usePortfolioContent();
+  const projects = content.projects.filter((project) => project.status === 'published');
 
-  const [num, setNum] = useState(6);
+  const num = 6;
 
   return (
     <div className={cn('bg-neutral-50 dark:bg-neutral-950', pathname == '/projects' && 'h-screen')}>
@@ -41,7 +41,7 @@ const Projects = () => {
                     'polygon(0 0, calc(100% - 18px) 0, 100% 18%, calc(100% - 10px) 50%, 100% 82%, calc(100% - 18px) 100%, 0 100%)',
                 }}
               />
-              <div className="absolute left-0 top-1/2 z-10 flex h-[60px] w-[60px] -translate-y-1/2 items-center justify-center rounded-full bg-[#0800d8]">
+              <div className="absolute top-1/2 left-0 z-10 flex h-[60px] w-[60px] -translate-y-1/2 items-center justify-center rounded-full bg-[#0800d8]">
                 <Image
                   src="/projects/flowersml.webp"
                   alt=""
@@ -50,7 +50,7 @@ const Projects = () => {
                   className="h-12 w-12 object-contain"
                 />
               </div>
-              <span className="relative z-10 whitespace-nowrap text-[16px] font-semibold leading-none text-white">
+              <span className="relative z-10 text-[16px] leading-none font-semibold whitespace-nowrap text-white">
                 My latest work
               </span>
             </div>

@@ -14,8 +14,8 @@ const DEFAULT_BEHIND_GRADIENT =
 const DEFAULT_INNER_GRADIENT = 'linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)';
 
 const ANIMATION_CONFIG = {
-  SMOOTH_DURATION: 600,
-  INITIAL_DURATION: 1500,
+  SMOOTH_DURATION: 190,
+  INITIAL_DURATION: 650,
   INITIAL_X_OFFSET: 70,
   INITIAL_Y_OFFSET: 60,
   DEVICE_BETA_OFFSET: 20,
@@ -54,7 +54,8 @@ type AnimationHandlers = {
     startX: number,
     startY: number,
     card: HTMLDivElement,
-    wrap: HTMLDivElement
+    wrap: HTMLDivElement,
+    onComplete?: () => void
   ) => void;
   cancelAnimation: () => void;
 };
@@ -66,8 +67,7 @@ const round = (value: number, precision = 3) => parseFloat(value.toFixed(precisi
 const adjust = (value: number, fromMin: number, fromMax: number, toMin: number, toMax: number) =>
   round(toMin + ((toMax - toMin) * (value - fromMin)) / (fromMax - fromMin));
 
-const easeInOutCubic = (x: number) =>
-  x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const easeInOutCubic = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 
 const ProfileCardComponent = ({
   avatarUrl = '/hero1.png',
@@ -92,7 +92,9 @@ const ProfileCardComponent = ({
   const wrapRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const pointerOffsetRef = useRef({ x: 0, y: 0 });
-  const leaveTimeoutRef = useRef<number | null>(null);
+  const pointerPositionRef = useRef({ x: 0, y: 0 });
+  const pointerFrameRef = useRef<number | null>(null);
+  const wrapBoundsRef = useRef<DOMRect | null>(null);
 
   const animationHandlers = useMemo<AnimationHandlers | null>(() => {
     if (!enableTilt) return null;
@@ -136,7 +138,8 @@ const ProfileCardComponent = ({
       startX: number,
       startY: number,
       card: HTMLDivElement,
-      wrap: HTMLDivElement
+      wrap: HTMLDivElement,
+      onComplete?: () => void
     ) => {
       const startTime = performance.now();
       const targetX = wrap.clientWidth / 2;
@@ -154,6 +157,9 @@ const ProfileCardComponent = ({
 
         if (progress < 1) {
           rafId = requestAnimationFrame(animationLoop);
+        } else {
+          rafId = null;
+          onComplete?.();
         }
       };
 
@@ -179,17 +185,18 @@ const ProfileCardComponent = ({
 
       if (!card || !wrap || !animationHandlers) return;
 
-      const rect = wrap.getBoundingClientRect();
-      const offsetX = event.clientX - rect.left;
-      const offsetY = event.clientY - rect.top;
+      pointerPositionRef.current = { x: event.clientX, y: event.clientY };
+      if (pointerFrameRef.current !== null) return;
 
-      pointerOffsetRef.current = { x: offsetX, y: offsetY };
-      animationHandlers.updateCardTransform(
-        offsetX,
-        offsetY,
-        card,
-        wrap
-      );
+      pointerFrameRef.current = window.requestAnimationFrame(() => {
+        const rect = wrapBoundsRef.current ?? wrap.getBoundingClientRect();
+        const offsetX = pointerPositionRef.current.x - rect.left;
+        const offsetY = pointerPositionRef.current.y - rect.top;
+
+        pointerOffsetRef.current = { x: offsetX, y: offsetY };
+        animationHandlers.updateCardTransform(offsetX, offsetY, card, wrap);
+        pointerFrameRef.current = null;
+      });
     },
     [animationHandlers]
   );
@@ -200,45 +207,40 @@ const ProfileCardComponent = ({
 
     if (!card || !wrap || !animationHandlers) return;
 
-    if (leaveTimeoutRef.current != null) {
-      window.clearTimeout(leaveTimeoutRef.current);
-      leaveTimeoutRef.current = null;
-    }
-
     animationHandlers.cancelAnimation();
+    wrapBoundsRef.current = wrap.getBoundingClientRect();
+    card.classList.remove('returning');
     wrap.classList.add('active');
     card.classList.add('active');
   }, [animationHandlers]);
 
-  const handlePointerLeave = useCallback(
-    () => {
-      const card = cardRef.current;
-      const wrap = wrapRef.current;
+  const handlePointerLeave = useCallback(() => {
+    const card = cardRef.current;
+    const wrap = wrapRef.current;
 
-      if (!card || !wrap || !animationHandlers) return;
+    if (!card || !wrap || !animationHandlers) return;
 
-      const { x, y } = pointerOffsetRef.current;
+    if (pointerFrameRef.current !== null) {
+      window.cancelAnimationFrame(pointerFrameRef.current);
+      pointerFrameRef.current = null;
+    }
 
-      animationHandlers.createSmoothAnimation(
-        ANIMATION_CONFIG.SMOOTH_DURATION,
-        x,
-        y,
-        card,
-        wrap
-      );
+    const { x, y } = pointerOffsetRef.current;
 
-      if (leaveTimeoutRef.current != null) {
-        window.clearTimeout(leaveTimeoutRef.current);
-      }
+    wrap.classList.remove('active');
+    card.classList.remove('active');
+    card.classList.add('returning');
+    wrapBoundsRef.current = null;
 
-      leaveTimeoutRef.current = window.setTimeout(() => {
-        wrap.classList.remove('active');
-        card.classList.remove('active');
-        leaveTimeoutRef.current = null;
-      }, ANIMATION_CONFIG.SMOOTH_DURATION);
-    },
-    [animationHandlers]
-  );
+    animationHandlers.createSmoothAnimation(
+      ANIMATION_CONFIG.SMOOTH_DURATION,
+      x,
+      y,
+      card,
+      wrap,
+      () => card.classList.remove('returning')
+    );
+  }, [animationHandlers]);
 
   const handleDeviceOrientation = useCallback(
     (event: DeviceOrientationEvent) => {
@@ -320,9 +322,9 @@ const ProfileCardComponent = ({
       window.removeEventListener('deviceorientation', deviceOrientationHandler);
       animationHandlers.cancelAnimation();
 
-      if (leaveTimeoutRef.current != null) {
-        window.clearTimeout(leaveTimeoutRef.current);
-        leaveTimeoutRef.current = null;
+      if (pointerFrameRef.current !== null) {
+        window.cancelAnimationFrame(pointerFrameRef.current);
+        pointerFrameRef.current = null;
       }
     };
   }, [
@@ -352,16 +354,17 @@ const ProfileCardComponent = ({
     const card = cardRef.current;
     const wrap = wrapRef.current;
 
-    if (leaveTimeoutRef.current != null) {
-      window.clearTimeout(leaveTimeoutRef.current);
-      leaveTimeoutRef.current = null;
-    }
-
     if (card && wrap) {
       animationHandlers?.cancelAnimation();
       wrap.classList.remove('active');
       card.classList.remove('active');
-      animationHandlers?.updateCardTransform(wrap.clientWidth / 2, wrap.clientHeight / 2, card, wrap);
+      card.classList.remove('returning');
+      animationHandlers?.updateCardTransform(
+        wrap.clientWidth / 2,
+        wrap.clientHeight / 2,
+        card,
+        wrap
+      );
     }
 
     onContactClick?.();
