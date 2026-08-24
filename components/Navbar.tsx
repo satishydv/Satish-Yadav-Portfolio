@@ -31,7 +31,7 @@ const Navbar: React.FC = (): JSX.Element => {
 
   const socialItems = [
     {
-      href: 'https://drive.google.com/file/d/1j9BOkVSlWk-_Axayj705fv7kHZp9mzFW/view?usp=sharing',
+      href: 'https://drive.google.com/file/d/1pR99zYg5kWPzvEL0cXL11mmj1vc7KYtw/view',
       label: 'Resume',
       icon: FileText,
     },
