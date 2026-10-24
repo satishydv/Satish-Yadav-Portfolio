@@ -1846,16 +1846,16 @@ function ToggleManager({
         <section className={cn(cardClass, 'p-4 sm:p-5')}>
           <div className="flex items-center justify-between">
             <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
-              <ShieldCheck className="size-4" />
+              <Globe2 className="size-4" />
             </div>
             <span className="rounded-lg bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
-              Safe mode
+              Worldwide
             </span>
           </div>
-          <p className="mt-3 text-[11px] text-zinc-400">Turned-off link behavior</p>
+          <p className="mt-3 text-[11px] text-zinc-400">Server persistence</p>
           <div className="mt-0.5 flex items-baseline justify-between">
-            <p className="text-xl font-bold tracking-tight">Click-Disabled</p>
-            <span className="text-[10px] text-zinc-400">Keeps icons visible</span>
+            <p className="text-xl font-bold tracking-tight">Global sync</p>
+            <span className="text-[10px] text-zinc-400">All devices & browsers</span>
           </div>
         </section>
       </div>

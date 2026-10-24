@@ -3,6 +3,8 @@ import './globals.css';
 import { Theme } from '@radix-ui/themes';
 import { Toaster } from 'sonner';
 import { DarkmodeProvider } from '@/store/DarkmodeProvider';
+import { PortfolioProvider } from '@/store/usePortfolioContent';
+import { getGlobalPortfolioContent } from '@/lib/portfolio-storage';
 import SiteChrome from '@/components/SiteChrome';
 import '@radix-ui/themes/styles.css';
 
@@ -74,6 +76,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const initialContent = getGlobalPortfolioContent();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -96,11 +100,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-neutral-50 dark:bg-neutral-950">
         <DarkmodeProvider>
-          <Theme>
-            <SiteChrome />
-            {children}
-            <Toaster />
-          </Theme>
+          <PortfolioProvider initialContent={initialContent}>
+            <Theme>
+              <SiteChrome />
+              {children}
+              <Toaster />
+            </Theme>
+          </PortfolioProvider>
         </DarkmodeProvider>
       </body>
     </html>
