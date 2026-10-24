@@ -1,40 +1,80 @@
 'use client';
 import Image from 'next/image';
 import { MagicCard } from '../magicui/magic-card';
-import { Link } from '@radix-ui/themes';
+import { Link, Tooltip } from '@radix-ui/themes';
 import { Bricolage } from '@/utils/fonts';
 import { useDarkmode } from '@/store/useDarkmode';
-import { ExpTypes } from '@/types/components/experience-types';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import { usePortfolioContent } from '@/store/usePortfolioContent';
 
 const Experience = () => {
   const { isDarkmode } = useDarkmode();
   const { content } = usePortfolioContent();
   const experience = content.experiences.filter((item) => item.status === 'published');
+  const isMasterEnabled = content.toggles?.experienceCompanyLinks !== false;
+
   return (
     <div className="mx-auto mt-4 flex w-[750px] flex-col items-center pb-8 max-lg:w-full max-lg:px-20 max-sm:w-full max-sm:px-5">
-      {experience.map((exp: ExpTypes) => (
-        <MagicCard
-          key={exp.org}
-          className="h-fit cursor-pointer border-none !bg-transparent dark:shadow-2xl"
-          gradientColor={`${isDarkmode === 'dark' ? '#262626' : 'oklch(95.6% 0.045 203.388)'}`}
-        >
-          <div
-            className={`${exp.role === 'Freelance' ? 'max-lg:ml-1 max-sm:ml-1' : ''} flex w-full px-5 py-3 max-sm:px-0 max-sm:pr-1`}
+      {experience.map((exp) => {
+        const isItemDisabled =
+          Boolean(exp.id && content.toggles?.disabledExperienceLinks?.[exp.id]) ||
+          Boolean(content.toggles?.disabledExperienceLinks?.[exp.org]);
+        const isLinkEnabled = isMasterEnabled && !isItemDisabled && Boolean(exp.link);
+
+        return (
+          <MagicCard
+            key={exp.id || exp.org}
+            className="h-fit cursor-pointer border-none !bg-transparent dark:shadow-2xl"
+            gradientColor={`${isDarkmode === 'dark' ? '#262626' : 'oklch(95.6% 0.045 203.388)'}`}
           >
             <div
-              className={`flex w-24 items-center justify-center max-sm:justify-start ${exp.logo === '/freelance-icon.webp' ? 'max-sm:!w-[79px]' : ''} ${exp.logo === '/stealth-startup.jpeg' ? 'max-sm:!w-[92px]' : ''}`}
+              className={`${exp.role === 'Freelance' ? 'max-lg:ml-1 max-sm:ml-1' : ''} flex w-full px-5 py-3 max-sm:px-0 max-sm:pr-1`}
             >
-              <Link href={exp.link} target="_blank">
-                <Image
-                  src={exp.logo}
-                  alt="company-logo"
-                  width={50}
-                  height={50}
-                  className={`rounded-full`}
-                />
-              </Link>
-            </div>
+              <div
+                className={`flex w-24 items-center justify-center max-sm:justify-start ${exp.logo === '/freelance-icon.webp' ? 'max-sm:!w-[79px]' : ''} ${exp.logo === '/stealth-startup.jpeg' ? 'max-sm:!w-[92px]' : ''}`}
+              >
+                <Tooltip
+                  content={
+                    isLinkEnabled
+                      ? `Visit ${exp.org}`
+                      : `${exp.org} (${!isMasterEnabled ? 'Company links disabled globally' : 'Company link turned off'})`
+                  }
+                >
+                  <Link
+                    href={isLinkEnabled ? exp.link : undefined}
+                    target={isLinkEnabled ? '_blank' : undefined}
+                    underline="none"
+                    onClick={
+                      !isLinkEnabled
+                        ? (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            toast.info(`${exp.org} company link is turned off in admin`);
+                          }
+                        : undefined
+                    }
+                    className={cn(
+                      'group block rounded-full transition-transform',
+                      isLinkEnabled
+                        ? 'hover:scale-105'
+                        : 'cursor-not-allowed opacity-60 grayscale-[60%]'
+                    )}
+                    aria-disabled={!isLinkEnabled}
+                  >
+                    <Image
+                      src={exp.logo}
+                      alt="company-logo"
+                      width={50}
+                      height={50}
+                      className={cn(
+                        'rounded-full transition-opacity',
+                        !isLinkEnabled && 'opacity-70'
+                      )}
+                    />
+                  </Link>
+                </Tooltip>
+              </div>
             <div className="w-full text-start">
               <div className={`${exp.role === 'Freelance' ? 'max-lg:ml-2 max-sm:ml-2' : ''}`}>
                 <div
@@ -98,7 +138,8 @@ const Experience = () => {
             </div>
           </div>
         </MagicCard>
-      ))}
+        );
+      })}
     </div>
   );
 };

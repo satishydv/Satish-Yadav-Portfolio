@@ -2,7 +2,7 @@ import { type ExpTypes } from '@/types/components/experience-types';
 
 const experience: ExpTypes[] = [
   {
-    org: 'CK Infynity',
+    org: 'Infynity',
     duration: 'November 2025 - Present',
     logo: '/company/sylow.png',
     role: 'Full Stack Developer',

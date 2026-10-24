@@ -1,21 +1,27 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
   BarChart3,
   BriefcaseBusiness,
+  Building2,
   Check,
   ChevronRight,
   CircleUserRound,
   Download,
+  ExternalLink,
   Eye,
   EyeOff,
+  FileText,
   FolderKanban,
+  Github,
   Globe2,
   LayoutDashboard,
+  Linkedin,
   LogOut,
   Menu,
   Moon,
@@ -25,6 +31,8 @@ import {
   RotateCcw,
   Search,
   Settings,
+  ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   Sun,
   Trash2,
@@ -38,6 +46,7 @@ import { cn } from '@/lib/utils';
 import { useDarkmode } from '@/store/useDarkmode';
 import { usePortfolioContent } from '@/store/usePortfolioContent';
 import type {
+  LinkToggles,
   ManagedExperience,
   ManagedProject,
   PortfolioProfile,
@@ -45,7 +54,7 @@ import type {
 } from '@/lib/portfolio-content';
 import { logoutAdmin } from './actions';
 
-type Section = 'overview' | 'projects' | 'experience' | 'profile' | 'settings';
+type Section = 'overview' | 'projects' | 'experience' | 'profile' | 'toggle' | 'settings';
 
 type NavigationItem = {
   id: Section;
@@ -58,6 +67,7 @@ const navigation: NavigationItem[] = [
   { id: 'projects', label: 'Projects', icon: FolderKanban },
   { id: 'experience', label: 'Experience', icon: BriefcaseBusiness },
   { id: 'profile', label: 'Profile', icon: CircleUserRound },
+  { id: 'toggle', label: 'Toggle', icon: SlidersHorizontal },
 ];
 
 const inputClass =
@@ -247,10 +257,115 @@ export default function AdminDashboard() {
   };
 
   const handleReset = () => {
-    if (!window.confirm('Reset projects, experience, and profile to the original content?')) return;
+    if (!window.confirm('Reset projects, experience, profile, and toggles to the original content?'))
+      return;
     resetContent();
     toast.success('Portfolio restored to defaults');
   };
+
+  const toggleNavbarLink = (key: 'navbarResume' | 'navbarGithub' | 'navbarLinkedin') => {
+    const isCurrent = content.toggles?.[key] !== false;
+    const nextVal = !isCurrent;
+    setContent((current) => ({
+      ...current,
+      toggles: {
+        ...current.toggles,
+        [key]: nextVal,
+      },
+    }));
+    const labels = {
+      navbarResume: 'Resume link',
+      navbarGithub: 'GitHub link',
+      navbarLinkedin: 'LinkedIn link',
+    };
+    toast.success(`${labels[key]} ${nextVal ? 'enabled' : 'turned off'}`);
+  };
+
+  const toggleExperienceMaster = () => {
+    const currentVal = content.toggles?.experienceCompanyLinks !== false;
+    const nextVal = !currentVal;
+    setContent((current) => ({
+      ...current,
+      toggles: {
+        ...current.toggles,
+        experienceCompanyLinks: nextVal,
+      },
+    }));
+    toast.success(`Company website links ${nextVal ? 'enabled' : 'turned off'} globally`);
+  };
+
+  const toggleIndividualExperienceLink = (id: string, org: string) => {
+    const isCurrentlyDisabled =
+      Boolean(id && content.toggles?.disabledExperienceLinks?.[id]) ||
+      Boolean(content.toggles?.disabledExperienceLinks?.[org]);
+    const nextDisabled = !isCurrentlyDisabled;
+
+    setContent((current) => ({
+      ...current,
+      toggles: {
+        ...current.toggles,
+        disabledExperienceLinks: {
+          ...(current.toggles?.disabledExperienceLinks || {}),
+          ...(id ? { [id]: nextDisabled } : {}),
+          [org]: nextDisabled,
+        },
+      },
+    }));
+    toast.success(`${org} company link ${nextDisabled ? 'turned off' : 'enabled'}`);
+  };
+
+  const enableAllLinks = () => {
+    setContent((current) => ({
+      ...current,
+      toggles: {
+        navbarResume: true,
+        navbarGithub: true,
+        navbarLinkedin: true,
+        experienceCompanyLinks: true,
+        disabledExperienceLinks: {},
+      },
+    }));
+    toast.success('All external links enabled');
+  };
+
+  const disableAllLinks = () => {
+    const allExpDisabled: Record<string, boolean> = {};
+    content.experiences.forEach((exp) => {
+      if (exp.id) allExpDisabled[exp.id] = true;
+      allExpDisabled[exp.org] = true;
+    });
+    setContent((current) => ({
+      ...current,
+      toggles: {
+        navbarResume: false,
+        navbarGithub: false,
+        navbarLinkedin: false,
+        experienceCompanyLinks: false,
+        disabledExperienceLinks: allExpDisabled,
+      },
+    }));
+    toast.info('All external links turned off');
+  };
+
+  const disabledLinkCount = useMemo(() => {
+    let count = 0;
+    if (content.toggles?.navbarResume === false) count += 1;
+    if (content.toggles?.navbarGithub === false) count += 1;
+    if (content.toggles?.navbarLinkedin === false) count += 1;
+    if (content.toggles?.experienceCompanyLinks === false) {
+      count += content.experiences.length;
+    } else {
+      content.experiences.forEach((exp) => {
+        if (
+          (exp.id && content.toggles?.disabledExperienceLinks?.[exp.id]) ||
+          content.toggles?.disabledExperienceLinks?.[exp.org]
+        ) {
+          count += 1;
+        }
+      });
+    }
+    return count;
+  }, [content.toggles, content.experiences]);
 
   return (
     <div
@@ -326,6 +441,18 @@ export default function AdminDashboard() {
               {item.id === 'projects' && (
                 <span className="ml-auto rounded-md bg-amber-300/80 px-1.5 py-0.5 text-[9px] font-bold text-zinc-900">
                   {content.projects.length}
+                </span>
+              )}
+              {item.id === 'toggle' && (
+                <span
+                  className={cn(
+                    'ml-auto rounded-md px-1.5 py-0.5 text-[9px] font-bold transition-colors',
+                    disabledLinkCount > 0
+                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
+                      : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                  )}
+                >
+                  {disabledLinkCount > 0 ? `${disabledLinkCount} off` : 'All on'}
                 </span>
               )}
             </button>
@@ -458,6 +585,17 @@ export default function AdminDashboard() {
                   profile={profileDraft}
                   onChange={setProfileDraft}
                   onSubmit={saveProfile}
+                />
+              )}
+              {activeSection === 'toggle' && (
+                <ToggleManager
+                  toggles={content.toggles}
+                  experiences={content.experiences}
+                  onToggleNavbarLink={toggleNavbarLink}
+                  onToggleExperienceMaster={toggleExperienceMaster}
+                  onToggleExperienceItem={toggleIndividualExperienceLink}
+                  onEnableAll={enableAllLinks}
+                  onDisableAll={disableAllLinks}
                 />
               )}
               {activeSection === 'settings' && (
@@ -1519,6 +1657,544 @@ function SettingsManager({ onExport, onReset }: { onExport: () => void; onReset:
           </div>
         </section>
       </div>
+    </>
+  );
+}
+
+function ToggleSwitch({
+  checked,
+  onChange,
+  label,
+  disabled = false,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  label: string;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      disabled={disabled}
+      onClick={onChange}
+      className={cn(
+        'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900',
+        checked ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-zinc-300 dark:bg-zinc-700',
+        disabled && 'cursor-not-allowed opacity-40'
+      )}
+    >
+      <span
+        className={cn(
+          'pointer-events-none inline-block size-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out',
+          checked ? 'translate-x-5' : 'translate-x-0'
+        )}
+      />
+    </button>
+  );
+}
+
+function ToggleManager({
+  toggles,
+  experiences,
+  onToggleNavbarLink,
+  onToggleExperienceMaster,
+  onToggleExperienceItem,
+  onEnableAll,
+  onDisableAll,
+}: {
+  toggles: LinkToggles;
+  experiences: ManagedExperience[];
+  onToggleNavbarLink: (key: 'navbarResume' | 'navbarGithub' | 'navbarLinkedin') => void;
+  onToggleExperienceMaster: () => void;
+  onToggleExperienceItem: (id: string, org: string) => void;
+  onEnableAll: () => void;
+  onDisableAll: () => void;
+}) {
+  const isMasterCompanyEnabled = toggles?.experienceCompanyLinks !== false;
+
+  const navbarLinks = [
+    {
+      key: 'navbarResume' as const,
+      label: 'Resume',
+      icon: FileText,
+      description: 'Document viewer link in the floating navigation dock',
+      url: 'https://drive.google.com/file/d/1pR99zYg5kWPzvEL0cXL11mmj1vc7KYtw/view',
+      enabled: toggles?.navbarResume !== false,
+      badgeColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300',
+    },
+    {
+      key: 'navbarGithub' as const,
+      label: 'GitHub Profile',
+      icon: Github,
+      description: 'Public repositories & code activity (@satishydv)',
+      url: 'https://github.com/satishydv',
+      enabled: toggles?.navbarGithub !== false,
+      badgeColor: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200',
+    },
+    {
+      key: 'navbarLinkedin' as const,
+      label: 'LinkedIn Profile',
+      icon: Linkedin,
+      description: 'Professional networking and career profile',
+      url: 'https://www.linkedin.com/in/thesatishydv/',
+      enabled: toggles?.navbarLinkedin !== false,
+      badgeColor: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300',
+    },
+  ];
+
+  const activeNavbarCount = navbarLinks.filter((item) => item.enabled).length;
+
+  const companyList = experiences.map((exp) => {
+    const isIndividuallyDisabled =
+      Boolean(exp.id && toggles?.disabledExperienceLinks?.[exp.id]) ||
+      Boolean(toggles?.disabledExperienceLinks?.[exp.org]);
+    const isEnabled = isMasterCompanyEnabled && !isIndividuallyDisabled && Boolean(exp.link);
+    return {
+      ...exp,
+      isIndividuallyDisabled,
+      isEnabled,
+    };
+  });
+
+  const activeCompanyCount = companyList.filter((item) => item.isEnabled).length;
+  const totalCompanyLinks = companyList.filter((item) => Boolean(item.link)).length;
+
+  return (
+    <>
+      <PageHeading
+        eyebrow="Workspace controls"
+        title="Link Toggles"
+        description="Turn external links on or off across your portfolio navbar and experience company cards. When turned off, links stay visible to maintain design continuity, while clicking is disabled."
+        action={
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={onEnableAll}
+              className="flex h-9 items-center gap-1.5 rounded-xl border border-black/[0.08] bg-white px-3.5 text-xs font-semibold text-zinc-800 transition hover:bg-zinc-50 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:bg-white/10"
+            >
+              <Check className="size-3.5 text-emerald-500" />
+              Enable all links
+            </button>
+            <button
+              type="button"
+              onClick={onDisableAll}
+              className="flex h-9 items-center gap-1.5 rounded-xl border border-black/[0.08] bg-white px-3.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 dark:border-white/10 dark:bg-white/5 dark:text-red-400 dark:hover:bg-red-500/10"
+            >
+              <X className="size-3.5" />
+              Turn off all
+            </button>
+          </div>
+        }
+      />
+
+      {/* Summary Cards */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <section className={cn(cardClass, 'p-4 sm:p-5')}>
+          <div className="flex items-center justify-between">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300">
+              <ExternalLink className="size-4" />
+            </div>
+            <span
+              className={cn(
+                'rounded-lg px-2 py-0.5 text-[9px] font-bold',
+                activeNavbarCount === 3
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'
+                  : 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300'
+              )}
+            >
+              {activeNavbarCount === 3 ? 'All active' : `${3 - activeNavbarCount} disabled`}
+            </span>
+          </div>
+          <p className="mt-3 text-[11px] text-zinc-400">Navbar floating dock</p>
+          <div className="mt-0.5 flex items-baseline justify-between">
+            <p className="text-xl font-bold tracking-tight">
+              {activeNavbarCount} / 3 <span className="text-xs font-normal text-zinc-400">on</span>
+            </p>
+            <span className="text-[10px] text-zinc-400">Resume, GitHub, LinkedIn</span>
+          </div>
+        </section>
+
+        <section className={cn(cardClass, 'p-4 sm:p-5')}>
+          <div className="flex items-center justify-between">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
+              <BriefcaseBusiness className="size-4" />
+            </div>
+            <span
+              className={cn(
+                'rounded-lg px-2 py-0.5 text-[9px] font-bold',
+                isMasterCompanyEnabled
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'
+                  : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-300'
+              )}
+            >
+              {isMasterCompanyEnabled ? 'Master: ON' : 'Master: OFF'}
+            </span>
+          </div>
+          <p className="mt-3 text-[11px] text-zinc-400">Experience company links</p>
+          <div className="mt-0.5 flex items-baseline justify-between">
+            <p className="text-xl font-bold tracking-tight">
+              {activeCompanyCount} / {totalCompanyLinks}{' '}
+              <span className="text-xs font-normal text-zinc-400">active</span>
+            </p>
+            <span className="text-[10px] text-zinc-400">Company logos</span>
+          </div>
+        </section>
+
+        <section className={cn(cardClass, 'p-4 sm:p-5')}>
+          <div className="flex items-center justify-between">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+              <ShieldCheck className="size-4" />
+            </div>
+            <span className="rounded-lg bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
+              Safe mode
+            </span>
+          </div>
+          <p className="mt-3 text-[11px] text-zinc-400">Turned-off link behavior</p>
+          <div className="mt-0.5 flex items-baseline justify-between">
+            <p className="text-xl font-bold tracking-tight">Click-Disabled</p>
+            <span className="text-[10px] text-zinc-400">Keeps icons visible</span>
+          </div>
+        </section>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        {/* Navbar Links Section */}
+        <section className={cn(cardClass, 'overflow-hidden')}>
+          <div className="border-b border-black/[0.06] p-5 dark:border-white/[0.07]">
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-8 items-center justify-center rounded-xl bg-amber-400/20 text-amber-700 dark:text-amber-300">
+                <SlidersHorizontal className="size-4" />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold">Navbar floating dock links</h2>
+                <p className="text-[10px] text-zinc-400">
+                  Control external links in the top floating dock
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="divide-y divide-black/[0.05] dark:divide-white/[0.06]">
+            {navbarLinks.map((item) => (
+              <div
+                key={item.key}
+                className="flex items-center justify-between gap-3 p-4.5 transition hover:bg-black/[0.015] dark:hover:bg-white/[0.015]"
+              >
+                <div className="flex min-w-0 items-start gap-3">
+                  <div
+                    className={cn(
+                      'flex size-10 shrink-0 items-center justify-center rounded-xl',
+                      item.badgeColor
+                    )}
+                  >
+                    <item.icon className="size-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-xs font-bold">{item.label}</p>
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold',
+                          item.enabled
+                            ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'
+                            : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'size-1.5 rounded-full',
+                            item.enabled ? 'bg-emerald-500' : 'bg-zinc-400'
+                          )}
+                        />
+                        {item.enabled ? 'Link active' : 'Link disabled'}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                      {item.description}
+                    </p>
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex max-w-[280px] items-center gap-1 truncate font-mono text-[10px] text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                        title={item.url}
+                      >
+                        <span className="truncate">{item.url}</span>
+                        <ExternalLink className="size-2.5 shrink-0 opacity-70" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 pl-2">
+                  <ToggleSwitch
+                    checked={item.enabled}
+                    onChange={() => onToggleNavbarLink(item.key)}
+                    label={`Toggle ${item.label}`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Experience Company Links Section */}
+        <section className={cn(cardClass, 'overflow-hidden')}>
+          <div className="border-b border-black/[0.06] p-5 dark:border-white/[0.07]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-8 items-center justify-center rounded-xl bg-amber-400/20 text-amber-700 dark:text-amber-300">
+                  <Building2 className="size-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-semibold">Experience company links</h2>
+                  <p className="text-[10px] text-zinc-400">
+                    Control company website links on experience cards
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Master Switch Banner */}
+            <div className="mt-4 flex items-center justify-between rounded-xl border border-black/[0.06] bg-amber-500/[0.06] p-3 dark:border-white/[0.08] dark:bg-amber-400/[0.05]">
+              <div>
+                <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  Global company links master switch
+                </p>
+                <p className="mt-0.5 text-[10px] text-zinc-500 dark:text-zinc-400">
+                  Turn off to disable all company website links across the experience section
+                </p>
+              </div>
+              <ToggleSwitch
+                checked={isMasterCompanyEnabled}
+                onChange={onToggleExperienceMaster}
+                label="Toggle all company links"
+              />
+            </div>
+          </div>
+
+          <div className="divide-y divide-black/[0.05] dark:divide-white/[0.06]">
+            {companyList.map((exp) => (
+              <div
+                key={exp.id || exp.org}
+                className="flex items-center justify-between gap-3 p-4.5 transition hover:bg-black/[0.015] dark:hover:bg-white/[0.015]"
+              >
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-black/[0.08] bg-zinc-100 dark:border-white/10 dark:bg-white/5">
+                    {exp.logo ? (
+                      <Image
+                        src={exp.logo}
+                        alt={exp.org}
+                        width={40}
+                        height={40}
+                        className={cn(
+                          'size-full object-contain',
+                          !exp.isEnabled && 'opacity-60 grayscale-[60%]'
+                        )}
+                        onError={(e) => {
+                          // Hide broken image
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <Building2 className="size-4 text-zinc-400" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-xs font-bold">{exp.org}</p>
+                      <span className="text-[10px] text-zinc-400">· {exp.role}</span>
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold',
+                          exp.isEnabled
+                            ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'
+                            : !isMasterCompanyEnabled
+                              ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300'
+                              : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'size-1.5 rounded-full',
+                            exp.isEnabled
+                              ? 'bg-emerald-500'
+                              : !isMasterCompanyEnabled
+                                ? 'bg-amber-400'
+                                : 'bg-zinc-400'
+                          )}
+                        />
+                        {exp.isEnabled
+                          ? 'Active'
+                          : !isMasterCompanyEnabled
+                            ? 'Turned off by master'
+                            : 'Disabled'}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-[10px] text-zinc-400">{exp.duration}</p>
+                    <div className="mt-1 flex items-center gap-2">
+                      {exp.link ? (
+                        <a
+                          href={exp.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex max-w-[280px] items-center gap-1 truncate font-mono text-[10px] text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                          title={exp.link}
+                        >
+                          <span className="truncate">{exp.link}</span>
+                          <ExternalLink className="size-2.5 shrink-0 opacity-70" />
+                        </a>
+                      ) : (
+                        <span className="text-[10px] text-zinc-400 italic">No URL configured</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 pl-2">
+                  <ToggleSwitch
+                    checked={!exp.isIndividuallyDisabled}
+                    disabled={!isMasterCompanyEnabled}
+                    onChange={() => onToggleExperienceItem(exp.id, exp.org)}
+                    label={`Toggle ${exp.org} link`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* Interactive Live Preview Card */}
+      <section className={cn(cardClass, 'mt-4 p-5 sm:p-6')}>
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold">Live interaction test & preview</h2>
+            <p className="text-[11px] text-zinc-400">
+              Click any element below to test how it responds in the current toggle state.
+            </p>
+          </div>
+          <span className="rounded-lg bg-zinc-100 px-2.5 py-1 text-[10px] font-semibold text-zinc-600 dark:bg-white/[0.06] dark:text-zinc-300">
+            Real-time reflection
+          </span>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {/* Dock Preview */}
+          <div className="rounded-2xl border border-black/[0.06] bg-zinc-100/70 p-5 text-center dark:border-white/[0.08] dark:bg-white/[0.02]">
+            <p className="mb-3 text-[10px] font-bold tracking-[0.14em] text-zinc-400 uppercase">
+              Navbar floating dock preview
+            </p>
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 p-2 shadow-lg backdrop-blur-md dark:border-white/20 dark:bg-zinc-900/80">
+              {navbarLinks.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => {
+                    if (item.enabled) {
+                      toast.success(`${item.label} link is ACTIVE: will open in new tab!`);
+                      window.open(item.url, '_blank');
+                    } else {
+                      toast.info(
+                        `${item.label} link is TURNED OFF: clicking does not navigate on site.`
+                      );
+                    }
+                  }}
+                  className={cn(
+                    'relative flex size-9 items-center justify-center rounded-full border transition-all duration-200',
+                    item.enabled
+                      ? 'border-black/10 bg-white shadow-sm hover:scale-110 hover:bg-zinc-50 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20'
+                      : 'cursor-not-allowed border-dashed border-zinc-300 bg-zinc-100/50 opacity-40 grayscale-[80%] dark:border-zinc-700 dark:bg-white/5'
+                  )}
+                  title={item.enabled ? `${item.label} (Active)` : `${item.label} (Disabled)`}
+                >
+                  <item.icon className="size-4" />
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-[10px] text-zinc-400">
+              {activeNavbarCount === 3
+                ? 'All 3 links are active and functional.'
+                : `${3 - activeNavbarCount} of 3 navbar links are turned off.`}
+            </p>
+          </div>
+
+          {/* Company Card Preview */}
+          <div className="rounded-2xl border border-black/[0.06] bg-zinc-100/70 p-5 dark:border-white/[0.08] dark:bg-white/[0.02]">
+            <p className="mb-3 text-[10px] font-bold tracking-[0.14em] text-zinc-400 uppercase">
+              Experience card company logo preview
+            </p>
+            {companyList[0] && (
+              <div className="flex items-center gap-3 rounded-xl border border-black/[0.05] bg-white p-3.5 shadow-sm dark:border-white/[0.08] dark:bg-[#1b1b18]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (companyList[0].isEnabled) {
+                      toast.success(
+                        `${companyList[0].org} link is ACTIVE: will open ${companyList[0].link}`
+                      );
+                      if (companyList[0].link) window.open(companyList[0].link, '_blank');
+                    } else {
+                      toast.info(
+                        `${companyList[0].org} link is TURNED OFF: clicking does not navigate.`
+                      );
+                    }
+                  }}
+                  className={cn(
+                    'group relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full border transition-transform',
+                    companyList[0].isEnabled
+                      ? 'border-emerald-200 hover:scale-105 dark:border-emerald-500/30'
+                      : 'cursor-not-allowed border-dashed border-zinc-300 opacity-60 grayscale-[60%] dark:border-zinc-700'
+                  )}
+                  title={
+                    companyList[0].isEnabled
+                      ? `Visit ${companyList[0].org}`
+                      : `${companyList[0].org} (Website link disabled)`
+                  }
+                >
+                  {companyList[0].logo ? (
+                    <Image
+                      src={companyList[0].logo}
+                      alt={companyList[0].org}
+                      width={48}
+                      height={48}
+                      className="size-full object-contain"
+                    />
+                  ) : (
+                    <Building2 className="size-5" />
+                  )}
+                </button>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold">{companyList[0].role}</p>
+                    <span className="text-[10px] text-zinc-400">{companyList[0].duration}</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                    {companyList[0].org}
+                  </p>
+                  <p className="mt-1 text-[10px] font-semibold text-zinc-400">
+                    Status:{' '}
+                    <span
+                      className={companyList[0].isEnabled ? 'text-emerald-500' : 'text-amber-500'}
+                    >
+                      {companyList[0].isEnabled ? 'Clickable' : 'Navigation disabled'}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
+            <p className="mt-3 text-[10px] text-zinc-400">
+              {isMasterCompanyEnabled
+                ? 'Master toggle is ON. Individual company controls take effect.'
+                : 'Master toggle is OFF. All company links are safely disabled.'}
+            </p>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

@@ -45,6 +45,9 @@ export function usePortfolioContent() {
       setContentState((current) => {
         const resolved = typeof next === 'function' ? next(current) : next;
         window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(resolved));
+        try {
+          window.dispatchEvent(new Event('portfolio-content-update'));
+        } catch {}
         return resolved;
       });
     },
@@ -54,6 +57,9 @@ export function usePortfolioContent() {
   const resetContent = useCallback(() => {
     const defaults = cloneDefaults();
     window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(defaults));
+    try {
+      window.dispatchEvent(new Event('portfolio-content-update'));
+    } catch {}
     setContentState(defaults);
   }, []);
 

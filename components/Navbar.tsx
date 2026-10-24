@@ -6,11 +6,14 @@ import { Home, FolderCode, User, FileText, Github, Linkedin, Sun, Moon } from 'l
 import { usePathname } from 'next/navigation';
 import type { JSX } from 'react';
 import { useDarkmode } from '@/store/useDarkmode';
+import { usePortfolioContent } from '@/store/usePortfolioContent';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Dock, DockIcon } from '@/components/magicui/dock';
 
 const Navbar: React.FC = (): JSX.Element => {
   const { isDarkmode, toggleDarkmode } = useDarkmode();
+  const { content } = usePortfolioContent();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = React.useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
@@ -29,17 +32,29 @@ const Navbar: React.FC = (): JSX.Element => {
     { href: '/about', label: 'About', icon: User, type: 'internal' },
   ];
 
+  const toggles = content?.toggles;
+
   const socialItems = [
     {
+      id: 'resume',
       href: 'https://drive.google.com/file/d/1pR99zYg5kWPzvEL0cXL11mmj1vc7KYtw/view',
       label: 'Resume',
       icon: FileText,
+      enabled: toggles?.navbarResume !== false,
     },
-    { href: 'https://github.com/satishydv', label: 'Github', icon: Github },
     {
+      id: 'github',
+      href: 'https://github.com/satishydv',
+      label: 'Github',
+      icon: Github,
+      enabled: toggles?.navbarGithub !== false,
+    },
+    {
+      id: 'linkedin',
       href: 'https://www.linkedin.com/in/thesatishydv/',
       label: 'Linkedin',
       icon: Linkedin,
+      enabled: toggles?.navbarLinkedin !== false,
     },
   ];
 
@@ -96,16 +111,36 @@ const Navbar: React.FC = (): JSX.Element => {
           />
 
           {socialItems.map((item) => (
-            <Tooltip key={item.href} content={item.label}>
-              <Link href={item.href} target="_blank" underline="none" className="flex items-center">
+            <Tooltip
+              key={item.href}
+              content={item.enabled ? item.label : `${item.label} (Link disabled)`}
+            >
+              <Link
+                href={item.enabled ? item.href : undefined}
+                target={item.enabled ? '_blank' : undefined}
+                underline="none"
+                onClick={
+                  !item.enabled
+                    ? (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        toast.info(`${item.label} link is disabled in admin`);
+                      }
+                    : undefined
+                }
+                className={cn('flex items-center', !item.enabled && 'cursor-not-allowed')}
+                aria-disabled={!item.enabled}
+              >
                 <DockIcon
                   className={cn(
-                    'relative overflow-hidden rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition-colors duration-200',
+                    'relative overflow-hidden rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition-all duration-200',
                     'shadow-[inset_0_1px_0px_rgba(255,255,255,0.7),0_6px_14px_rgba(0,0,0,0.18)]',
                     "before:pointer-events-none before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/60 before:via-transparent before:to-transparent before:opacity-70 before:content-['']",
                     "after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:bg-gradient-to-tl after:from-white/30 after:via-transparent after:to-transparent after:opacity-50 after:content-['']",
-                    'hover:bg-white/25',
-                    'dark:border-white/15 dark:bg-white/5 dark:hover:bg-white/15'
+                    item.enabled
+                      ? 'hover:bg-white/25 dark:hover:bg-white/15'
+                      : 'cursor-not-allowed opacity-35 grayscale-[70%] hover:bg-white/10 dark:hover:bg-white/5',
+                    'dark:border-white/15 dark:bg-white/5'
                   )}
                 >
                   <item.icon className="size-full text-black dark:text-white" />

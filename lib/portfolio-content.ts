@@ -23,10 +23,19 @@ export type PortfolioProfile = {
   availability: string;
 };
 
+export type LinkToggles = {
+  navbarResume: boolean;
+  navbarGithub: boolean;
+  navbarLinkedin: boolean;
+  experienceCompanyLinks: boolean;
+  disabledExperienceLinks?: Record<string, boolean>;
+};
+
 export type PortfolioContent = {
   projects: ManagedProject[];
   experiences: ManagedExperience[];
   profile: PortfolioProfile;
+  toggles: LinkToggles;
 };
 
 const slugify = (value: string) =>
@@ -35,6 +44,14 @@ const slugify = (value: string) =>
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+
+export const defaultLinkToggles: LinkToggles = {
+  navbarResume: true,
+  navbarGithub: true,
+  navbarLinkedin: true,
+  experienceCompanyLinks: true,
+  disabledExperienceLinks: {},
+};
 
 export const defaultPortfolioContent: PortfolioContent = {
   projects: projects.map((project, index) => ({
@@ -57,6 +74,7 @@ export const defaultPortfolioContent: PortfolioContent = {
     location: 'India',
     availability: 'Open to opportunities',
   },
+  toggles: defaultLinkToggles,
 };
 
 export const PORTFOLIO_STORAGE_KEY = 'satish-portfolio-content-v1';
@@ -70,6 +88,14 @@ export function normalizePortfolioContent(value: Partial<PortfolioContent>): Por
     profile: {
       ...defaultPortfolioContent.profile,
       ...(value.profile ?? {}),
+    },
+    toggles: {
+      ...defaultLinkToggles,
+      ...(value.toggles ?? {}),
+      disabledExperienceLinks: {
+        ...(defaultLinkToggles.disabledExperienceLinks ?? {}),
+        ...(value.toggles?.disabledExperienceLinks ?? {}),
+      },
     },
   };
 }
