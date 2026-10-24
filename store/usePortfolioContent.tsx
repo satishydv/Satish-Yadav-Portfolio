@@ -37,22 +37,57 @@ export function PortfolioProvider({
   initialContent?: PortfolioContent;
 }) {
   const [content, setContentState] = useState<PortfolioContent>(() => {
+    // 1. Try reading from localStorage first if available on client
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = window.localStorage.getItem(PORTFOLIO_STORAGE_KEY);
+        if (stored) {
+          const parsed = normalizePortfolioContent(JSON.parse(stored));
+          // If stored is newer than server-rendered initialContent, prefer stored
+          if (
+            !initialContent?.updatedAt ||
+            (parsed.updatedAt && parsed.updatedAt >= initialContent.updatedAt)
+          ) {
+            return parsed;
+          }
+        }
+      } catch {}
+    }
+
     if (initialContent) return normalizePortfolioContent(initialContent);
     return cloneDefaults();
   });
   const [isReady, setIsReady] = useState(false);
 
-  // Sync with global server API
+  // Sync with global server API with timestamp arbitration
   const fetchGlobalContent = useCallback(async () => {
     try {
       const res = await fetch('/api/portfolio-content', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        const normalized = normalizePortfolioContent(data);
-        setContentState(normalized);
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(normalized));
-        }
+        const serverNormalized = normalizePortfolioContent(data);
+
+        setContentState((currentLocal) => {
+          const localTimestamp = currentLocal?.updatedAt ?? 0;
+          const serverTimestamp = serverNormalized?.updatedAt ?? 0;
+
+          // If local edits are newer than what server returned (e.g. server slow or file read-only),
+          // preserve the local changes and re-push them to the server!
+          if (localTimestamp > serverTimestamp) {
+            fetch('/api/portfolio-content', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(currentLocal),
+            }).catch(() => {});
+            return currentLocal;
+          }
+
+          // Server is newer or equal: adopt server content
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(serverNormalized));
+          }
+          return serverNormalized;
+        });
       }
     } catch (err) {
       console.warn('Could not fetch global portfolio content:', err);
@@ -62,20 +97,25 @@ export function PortfolioProvider({
   }, []);
 
   useEffect(() => {
-    // 1. Initial check: check localStorage first for instant fast-render if available
+    // Check localStorage on mount
     if (typeof window !== 'undefined') {
       try {
         const stored = window.localStorage.getItem(PORTFOLIO_STORAGE_KEY);
         if (stored) {
-          setContentState(normalizePortfolioContent(JSON.parse(stored)));
+          const parsed = normalizePortfolioContent(JSON.parse(stored));
+          setContentState((current) => {
+            if ((parsed.updatedAt ?? 0) >= (current?.updatedAt ?? 0)) {
+              return parsed;
+            }
+            return current;
+          });
         }
       } catch {}
     }
 
-    // 2. Fetch fresh global content from server
+    // Fetch fresh global content from server
     fetchGlobalContent();
 
-    // 3. Listen to local/storage updates
     const handleStorage = (event: StorageEvent) => {
       if (!event.key || event.key === PORTFOLIO_STORAGE_KEY) {
         fetchGlobalContent();
@@ -90,7 +130,6 @@ export function PortfolioProvider({
       } catch {}
     };
 
-    // 4. Also revalidate when tab gains focus
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         fetchGlobalContent();
@@ -112,7 +151,10 @@ export function PortfolioProvider({
     (next: PortfolioContent | ((current: PortfolioContent) => PortfolioContent)) => {
       setContentState((current) => {
         const resolved = typeof next === 'function' ? next(current) : next;
-        const normalized = normalizePortfolioContent(resolved);
+        const normalized = normalizePortfolioContent({
+          ...resolved,
+          updatedAt: Date.now(),
+        });
 
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(normalized));
@@ -121,7 +163,7 @@ export function PortfolioProvider({
           } catch {}
         }
 
-        // Persist to server globally across all devices & browsers!
+        // Persist to server globally across all devices & browsers
         fetch('/api/portfolio-content', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -137,7 +179,11 @@ export function PortfolioProvider({
   );
 
   const resetContent = useCallback(() => {
-    const defaults = cloneDefaults();
+    const defaults = normalizePortfolioContent({
+      ...cloneDefaults(),
+      updatedAt: Date.now(),
+    });
+
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(defaults));
       try {
@@ -192,9 +238,14 @@ export function usePortfolioContent(): PortfolioContextType {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) {
-          const normalized = normalizePortfolioContent(data);
-          setContentState(normalized);
-          window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(normalized));
+          const serverNormalized = normalizePortfolioContent(data);
+          setContentState((currentLocal) => {
+            const localTimestamp = currentLocal?.updatedAt ?? 0;
+            const serverTimestamp = serverNormalized?.updatedAt ?? 0;
+            if (localTimestamp > serverTimestamp) return currentLocal;
+            window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(serverNormalized));
+            return serverNormalized;
+          });
         }
       })
       .catch(() => {});
@@ -217,7 +268,10 @@ export function usePortfolioContent(): PortfolioContextType {
     (next: PortfolioContent | ((current: PortfolioContent) => PortfolioContent)) => {
       setContentState((current) => {
         const resolved = typeof next === 'function' ? next(current) : next;
-        const normalized = normalizePortfolioContent(resolved);
+        const normalized = normalizePortfolioContent({
+          ...resolved,
+          updatedAt: Date.now(),
+        });
         window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(normalized));
         try {
           window.dispatchEvent(new Event('portfolio-content-update'));
@@ -237,7 +291,10 @@ export function usePortfolioContent(): PortfolioContextType {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resetContent = useCallback(() => {
-    const defaults = cloneDefaults();
+    const defaults = normalizePortfolioContent({
+      ...cloneDefaults(),
+      updatedAt: Date.now(),
+    });
     window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(defaults));
     try {
       window.dispatchEvent(new Event('portfolio-content-update'));

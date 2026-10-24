@@ -36,6 +36,7 @@ export type PortfolioContent = {
   experiences: ManagedExperience[];
   profile: PortfolioProfile;
   toggles: LinkToggles;
+  updatedAt?: number;
 };
 
 const slugify = (value: string) =>
@@ -75,6 +76,7 @@ export const defaultPortfolioContent: PortfolioContent = {
     availability: 'Open to opportunities',
   },
   toggles: defaultLinkToggles,
+  updatedAt: 0,
 };
 
 export const PORTFOLIO_STORAGE_KEY = 'satish-portfolio-content-v1';
@@ -97,5 +99,6 @@ export function normalizePortfolioContent(value: Partial<PortfolioContent>): Por
         ...(value.toggles?.disabledExperienceLinks ?? {}),
       },
     },
+    updatedAt: typeof value.updatedAt === 'number' ? value.updatedAt : Date.now(),
   };
 }

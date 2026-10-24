@@ -30,3 +30,11 @@ model Visitor {
   @@index([visitDate])
   @@map("visitors")
 }
+
+model PortfolioSettings {
+  id        String   @id @default("global")
+  content   Json
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("portfolio_settings")
+}

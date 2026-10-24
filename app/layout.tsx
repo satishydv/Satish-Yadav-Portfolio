@@ -75,8 +75,8 @@ export const metadata: Metadata = {
   category: 'Portfolio Website',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const initialContent = getGlobalPortfolioContent();
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const initialContent = await getGlobalPortfolioContent();
 
   return (
     <html lang="en" suppressHydrationWarning>

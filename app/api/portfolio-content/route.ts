@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const content = getGlobalPortfolioContent();
+    const content = await getGlobalPortfolioContent();
     return NextResponse.json(content, {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const normalized = normalizePortfolioContent(body);
-    const saved = saveGlobalPortfolioContent(normalized);
+    const saved = await saveGlobalPortfolioContent(normalized);
 
     if (!saved) {
       return NextResponse.json(
